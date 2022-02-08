@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\API;
-
+//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
 use App\Http\Controllers\Controller;
 use App\Models\Lead;
 use App\Models\Visit;
@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Nette\Utils\DateTime;
+use Illuminate\Support\Facades\Redis;
 
 class AnalyticController extends Controller
 {
@@ -58,6 +59,9 @@ class AnalyticController extends Controller
             ->orderByDesc('data')
             //->take(5)
             ->get();
+
+        //Redis::set('name', 'Taylor');
+        error_log(Redis::get('Visit:*'));
 
         return response()->json([
             "success" => true,

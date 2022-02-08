@@ -20,7 +20,7 @@ class LeadController extends Controller
             ->orderByDesc('date')
             ->take(100)
             ->get();
-*/
+        */
         return response()->json([
             "success" => true,
             "data" => $leads,
@@ -39,24 +39,6 @@ class LeadController extends Controller
         $input = $request->all();
         $validator = Validator::make($input, [
             'user_id' => 'required',
-        /*    'type' => 'required',
-            'date' => 'required',
-            'stage' => 'required',
-            'price' => 'required',
-            'department' => 'required',
-            'fio' => 'required',
-            'phone' => 'required',
-            'email' => 'required',
-            'pay' => 'required',
-            'device' => 'required',
-            'info' => 'required',
-            'order_number' => 'required',
-            'utm_source' => 'required',
-            'utm_medium' => 'required',
-            'utm_campaign' => 'required',
-            'utm_content' => 'required',
-            'utm_term' => 'required',
-            'referer_page' => 'required'*/
         ]);
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());

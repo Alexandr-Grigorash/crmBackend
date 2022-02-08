@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Redis;
 
 class VisitController extends Controller
 {
@@ -19,7 +20,7 @@ class VisitController extends Controller
 
     public function index()
     {
-        $visits  = Visit::whereDate('date', Carbon::today()->toDateString())
+        $visits = Visit::whereDate('date', Carbon::today()->toDateString())
             ->orderByDesc('date')
             ->take(50)
             ->get();
@@ -44,48 +45,35 @@ class VisitController extends Controller
         $validator = Validator::make($input, [
             'user_id' => 'required',
             'date' => 'required',
-           /* 'visit_page' => 'required',
-            'utm_source' => 'required',
-            'utm_medium' => 'required',
-            'utm_campaign' => 'required',
-            'utm_content' => 'required',
-            'utm_term' => 'required',
-            'utm_referer' => 'required',
-            'device' => 'required',
-            'screen' => 'required',*/
-            'ip' => 'required'
         ]);
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
         }
-        $visit = Visit::create($input);
 
+        Redis::rpush('Vst', json_encode($input));
+        Redis::lrange('Vst',0,-1);
+
+
+        //$visit = Visit::create($input);
         return response()->json([
             "success" => true,
-            "data" => $visit
+            //"data" => $visit
         ]);
     }
 
-    public function show(){
-       // return response()->json(['error' => 'Not authorized.'],403);
-    }
-    public function update(){
-        //return response()->json(['error' => 'Not authorized.'],403);
-    }
-
-    public function destroy(){
-        return response()->json(['error' => 'Not authorized.'],403);
-    }
-
-    /*
-    public function destroy(Visit $visit)
+    public function show()
     {
-        $visit->delete();
-        return response()->json([
-            "success" => true,
-            "message" => "Product deleted successfully.",
-            "data" => $visit
-        ]);
+        return response()->json(['error' => 'Not authorized.'], 403);
     }
-    */
+
+    public function update()
+    {
+        return response()->json(['error' => 'Not authorized.'], 403);
+    }
+
+    public function destroy()
+    {
+        return response()->json(['error' => 'Not authorized.'], 403);
+    }
+
 }
