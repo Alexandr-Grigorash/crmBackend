@@ -10,6 +10,7 @@ use DB;
 use Illuminate\Http\Request;
 use Nette\Utils\DateTime;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Cache;
 
 class AnalyticController extends Controller
 {
@@ -20,9 +21,18 @@ class AnalyticController extends Controller
      */
 
 
-    public function analytic(Request $request){
+    public function analytic(Request $request)
+    {
         $startingDate = ($request->startingDate != 0) ? $request->startingDate : date("Y-m-01");
         $finalDate = ($request->finalDate != 0) ? $request->finalDate : date("Y-m-d");
+
+        if ($request->startingDate == 0 && $request->finalDate == 0 && Cache::has('screen')) {
+            $visits = Cache::get('visits');
+            $device = Cache::get('device');
+            $department = Cache::get('department');
+            $stage = Cache::get('stage');
+            $screen = Cache::get('screen');
+        } else {
 
         $visits = DB::table('visits')
             ->select(DB::raw('DATE(date) as label, count(*) as data'))
@@ -60,8 +70,15 @@ class AnalyticController extends Controller
             //->take(5)
             ->get();
 
-        //Redis::set('name', 'Taylor');
-        error_log(Redis::get('Visit:*'));
+
+        Cache::set('visits', $visits, 60);
+        Cache::set('device', $device, 60);
+        Cache::set('department', $department, 60);
+        Cache::set('stage', $stage, 60);
+        Cache::set('screen', $screen, 60);
+
+        }
+       // error_log(Redis::get('Visit:*'));
 
         return response()->json([
             "success" => true,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Jobs\visitsAddDB;
 use App\Models\Visit;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -50,8 +51,10 @@ class VisitController extends Controller
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        Redis::rpush('Vst', json_encode($input));
-        Redis::lrange('Vst',0,-1);
+        visitsAddDB::dispatch($input);
+
+        //Redis::rpush('Vst', json_encode($input));
+        //Redis::lrange('Vst',0,-1);
 
 
         //$visit = Visit::create($input);
